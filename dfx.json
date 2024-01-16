@@ -1,0 +1,30 @@
+{
+  "canisters": {
+    "small_biz_backend": {
+      "candid": "src/small_biz_backend/small_biz_backend.did",
+      "package": "small_biz_backend",
+      "type": "rust"
+    },
+    "small_biz_frontend": {
+      "dependencies": [
+        "small_biz_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/small_biz_frontend/src/index.html"
+      },
+      "source": [
+        "src/small_biz_frontend/assets",
+        "dist/small_biz_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
