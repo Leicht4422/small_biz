@@ -22,15 +22,15 @@ type ExpensePayload = record {
   amount : float64;
 };
 type Sale = record {
-  id : nat64;
-  name : text;
-  description : text;
-  quantity : nat32;
-  amount: nat64;
-  created_at : nat64;
-  store_id : nat64;
+  id: nat64;
+  name: text;
+  description: opt text;
+  quantity: nat32;
+  amount: float64;
+  timestamp: nat64;
+  store_id: nat64;
 };
-type SalePayload = record { id : nat64; name : text; quantity : nat32; amount: nat64; store_id : nat64 };
+type SalePayload = record { id : nat64; name : text; description : text; quantity : nat32; amount: float64; store_id : nat64; };
 type Result = variant { Ok : Inventory; Err : Error };
 type Result1 = variant { Ok : Sale; Err : Error };
 

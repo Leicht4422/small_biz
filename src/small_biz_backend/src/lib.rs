@@ -41,7 +41,7 @@ impl BoundedStorable for Inventory {
 struct Sale {
     id: u64,
     name: String,
-    description: String,
+    description: Option<String>,
     quantity: u32,
     amount: f64,
     timestamp: u64,
@@ -128,7 +128,7 @@ struct InventoryPayload {
 #[derive(candid::CandidType, Serialize, Deserialize, Default)]
 struct SalePayload {
     name: String,
-    description: String,
+    description: Option<String>,
     quantity: u32,
     amount: f64,
     store_id: u64,
@@ -231,6 +231,29 @@ fn add_sale(payload: SalePayload) -> Option<Sale> {
             counter.borrow_mut().set(current_value + 1)
         })
         .expect("cannot increment id counter");
+        // Use store_id from the sale payload to find the corresponding inventory item
+    let inventory_id = payload.store_id;
+    match INV_STORAGE.with(|service| service.borrow().get(&inventory_id)) {
+        Some(mut inventory_item) => {
+            // Check if there is enough quantity in the inventory
+            if inventory_item.quantity >= payload.quantity {
+                // Decrement the quantity in the inventory
+                inventory_item.quantity -= payload.quantity;
+                do_insert(&inventory_item); // Update the inventory
+            } else {
+                // Handle the case where there is not enough quantity in the inventory
+                // You may want to roll back the sale or handle this situation appropriately
+                // For simplicity, I'm returning None in this case
+                return None;
+            }
+        }
+        None => {
+            // Handle the case where the corresponding inventory item is not found
+            // You may want to roll back the sale or handle this situation appropriately
+            // For simplicity, I'm returning None in this case
+            return None;
+        }
+    }
     let sale = Sale {
         id,
         name: payload.name,
@@ -252,6 +275,7 @@ fn update_sale(id: u64, payload: SalePayload) -> Result<Sale, Error> {
             sale.description =  payload.description;
             sale.quantity =  payload.quantity;
             sale.store_id = payload.store_id;
+            sale.amount = payload.amount;
             sale.timestamp = time();
             do_insert_sale(&sale);
             Ok(sale)
