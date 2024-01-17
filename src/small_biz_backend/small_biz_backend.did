@@ -1,3 +1,48 @@
+type Inventory = record {
+  id : nat64;
+  updated_at : opt nat64;
+  name : text;
+  description : text;
+  created_at : nat64;
+  quantity : nat32;
+  amount: nat64;
+};
+type InventoryPayload = record { name : text; description : text; quantity : nat32; amount : nat64 };
+type Error = variant { NotFound : record { msg : text } };
+type Expense = record {
+  id : nat64;
+  name: text;
+  description : text;
+  timestamp : nat64;
+  amount : float64;
+};
+type ExpensePayload = record {
+  description : text;
+  name : text; 
+  amount : float64;
+};
+type Sale = record {
+  id : nat64;
+  name : text;
+  description : text;
+  quantity : nat32;
+  amount: nat64;
+  created_at : nat64;
+  store_id : nat64;
+};
+type SalePayload = record { id : nat64; name : text; quantity : nat32; amount: nat64; store_id : nat64 };
+type Result = variant { Ok : Inventory; Err : Error };
+type Result1 = variant { Ok : Sale; Err : Error };
+
 service : {
-    "greet": (text) -> (text) query;
+add_inventory : (InventoryPayload) -> (opt Inventory);
+update_inventory : (nat64, InventoryPayload) -> (Result);
+get_inventory : (nat64) -> (Result) query;
+delete_inventory : (nat64) -> (Result);
+add_sale : (SalePayload) -> (opt Sale);
+update_sale : (nat64, SalePayload) -> (Result1);
+get_sale : (nat64) -> (Result1) query;
+delete_sale : (nat64) -> (Result1);
 }
+
+
