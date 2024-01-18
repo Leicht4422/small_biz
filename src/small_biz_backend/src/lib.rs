@@ -70,7 +70,7 @@ struct Expense {
     id: u64,
     name: String,
     description: String,
-    amount: u64,
+    amount: f64,
     timestamp: u64,
 }
 
@@ -111,7 +111,7 @@ thread_local! {
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(2)))
     ));
 
-    static EXPENSES_STORAGE: RefCell<StableBTreeMap<u64, Expense, Memory>> =
+    static EXPENSE_STORAGE: RefCell<StableBTreeMap<u64, Expense, Memory>> =
         RefCell::new(StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(3)))
     ));
@@ -138,7 +138,7 @@ struct SalePayload {
 struct ExpensePayload {
     name: String,
     description: String,
-    amount: u64
+    amount: f64
 }
 
 #[ic_cdk::query]
@@ -302,6 +302,72 @@ fn delete_sale(id: u64) -> Result<Sale, Error> {
     }
 }
 
+#[ic_cdk::query]
+fn get_expense(id: u64) -> Result<Expense, Error> {
+    match _get_expense(&id) {
+        Some(expense) => Ok(expense),
+        None => Err(Error::NotFound {
+            msg: format!("Expense with id={} not found", id),
+        }),
+    }
+}
+
+fn _get_expense(id: &u64) -> Option<Expense> {
+    EXPENSE_STORAGE.with(|service| service.borrow().get(id))
+}
+
+#[ic_cdk::update]
+fn add_expense(payload: ExpensePayload) -> Option<Expense> {
+    let id = ID_COUNTER
+        .with(|counter| {
+            let current_value = *counter.borrow().get();
+            counter.borrow_mut().set(current_value + 1)
+        })
+        .expect("cannot increment id counter");
+    let expense = Expense {
+        id,
+        name: payload.name,
+        description: payload.description,
+        amount: payload.amount,
+        timestamp: time(),
+    };
+    do_insert_expense(&expense);
+    Some(expense)
+}
+
+#[ic_cdk::update]
+fn update_expense(id: u64, payload: ExpensePayload
+) -> Result<Expense, Error> {
+    match EXPENSE_STORAGE.with(|service| service.borrow().get(&id)) {
+        Some(mut expense) => {
+            expense.name = payload.name;
+            expense.description =  payload.description;
+            expense.amount = payload.amount;
+            expense.timestamp = time();
+            do_insert_expense(&expense);
+            Ok(expense)
+        }
+        None => Err(Error::NotFound {
+            msg: format!(
+                "Expense in Inventory with id={}. is not found",id),
+        }),
+    }
+}
+
+fn do_insert_expense(expense: &Expense) {
+    EXPENSE_STORAGE.with(|service| service.borrow_mut().insert(expense.id, expense.clone()));
+}
+
+#[ic_cdk::update]
+fn delete_expense(id: u64) -> Result<Expense, Error> {
+    match EXPENSE_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
+        Some(sale) => Ok(sale),
+        None => Err(Error::NotFound {
+            msg: format!(
+                "Expense with id={}. is not found",id),
+        }),
+    }
+}
 
 #[derive(candid::CandidType, Deserialize, Serialize)]
 enum Error {

@@ -17,8 +17,8 @@ type Expense = record {
   amount : float64;
 };
 type ExpensePayload = record {
-  description : text;
   name : text; 
+  description : text;
   amount : float64;
 };
 type Sale = record {
@@ -30,10 +30,10 @@ type Sale = record {
   timestamp: nat64;
   store_id: nat64;
 };
-type SalePayload = record { id : nat64; name : text; description : text; quantity : nat32; amount: float64; store_id : nat64; };
+type SalePayload = record { name : text; description : text; quantity : nat32; amount: float64; store_id : nat64; };
 type Result = variant { Ok : Inventory; Err : Error };
 type Result1 = variant { Ok : Sale; Err : Error };
-
+type Result2 = variant { Ok : Expense; Err : Error };
 service : {
 add_inventory : (InventoryPayload) -> (opt Inventory);
 update_inventory : (nat64, InventoryPayload) -> (Result);
@@ -43,6 +43,11 @@ add_sale : (SalePayload) -> (opt Sale);
 update_sale : (nat64, SalePayload) -> (Result1);
 get_sale : (nat64) -> (Result1) query;
 delete_sale : (nat64) -> (Result1);
+add_expense : (ExpensePayload) -> (opt Expense);
+update_expense : (nat64, ExpensePayload) -> (Result2);
+get_expense : (nat64) -> (Result2) query;
+delete_expense : (nat64) -> (Result2);
+
 }
 
 
