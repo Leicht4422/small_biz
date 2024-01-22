@@ -15,7 +15,7 @@ struct Inventory {
     name: String,
     description: String,
     quantity: u32,
-    amount: u64,
+    amount: f64,
     created_at: u64,
     updated_at: Option<u64>,
 }
@@ -122,7 +122,7 @@ struct InventoryPayload {
     name: String,
     description: String,
     quantity: u32,
-    amount: u64
+    amount: f64
 }
 
 #[derive(candid::CandidType, Serialize, Deserialize, Default)]
@@ -368,6 +368,91 @@ fn delete_expense(id: u64) -> Result<Expense, Error> {
         }),
     }
 }
+
+#[ic_cdk::query]
+fn get_all_expenses() -> Result<Vec<Expense>, Error> {
+    let expenses_map: Vec<(u64, Expense)> = EXPENSE_STORAGE.with(|service| service.borrow().iter().collect());
+    let expenses: Vec<Expense> = expenses_map.into_iter().map(|(_, expense)| expense).collect();
+
+    if !expenses.is_empty() {
+        Ok(expenses)
+    } else {
+        Err(Error::NotFound {
+            msg: "No expenses found.".to_string(),
+        })
+    }
+}
+
+#[ic_cdk::query]
+fn get_all_sales() -> Result<Vec<Sale>, Error> {
+    let sale_map: Vec<(u64, Sale)> = SALE_STORAGE.with(|service| service.borrow().iter().collect());
+    let sale: Vec<Sale> = sale_map.into_iter().map(|(_, sale)| sale).collect();
+
+    if !sale.is_empty() {
+        Ok(sale)
+    } else {
+        Err(Error::NotFound {
+            msg: "No sales found.".to_string(),
+        })
+    }
+}
+
+#[ic_cdk::query]
+fn get_all_inventory() -> Result<Vec<Inventory>, Error> {
+    let inventory_map: Vec<(u64, Inventory)> = INV_STORAGE.with(|service| service.borrow().iter().collect());
+    let inventory: Vec<Inventory> = inventory_map.into_iter().map(|(_, inventory)| inventory).collect();
+
+    if !inventory.is_empty() {
+        Ok(inventory)
+    } else {
+        Err(Error::NotFound {
+            msg: "Empty Inventory Refill soon .".to_string(),
+        })
+    }
+}
+
+#[ic_cdk::query]
+fn calculate_total_sales_amount() -> Result<f64, Error> {
+    let total_amount: f64 = SALE_STORAGE
+        .with(|service| {
+            service
+                .borrow()
+                .iter()
+                .map(|(_, sale)| sale.amount)
+                .sum()
+        });
+
+    Ok(total_amount)
+}
+
+#[ic_cdk::query]
+fn calculate_total_expenses_amount() -> Result<f64, Error> {
+    let total_expenses: f64 = EXPENSE_STORAGE
+        .with(|service| {
+            service
+                .borrow()
+                .iter()
+                .map(|(_, expense)| expense.amount)
+                .sum()
+        });
+
+    Ok(total_expenses)
+}
+
+#[ic_cdk::query]
+fn calculate_total_inv_amount() -> Result<f64, Error> {
+    let total_inv_amount: f64 = INV_STORAGE
+        .with(|service| {
+            service
+                .borrow()
+                .iter()
+                .map(|(_, inventory)| inventory.amount)
+                .sum()
+        });
+
+    Ok(total_inv_amount)
+}
+
 
 #[derive(candid::CandidType, Deserialize, Serialize)]
 enum Error {
