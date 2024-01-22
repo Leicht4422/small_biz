@@ -1,6 +1,28 @@
-# small_biz
+# Small Biz Management System
 
-Welcome to your new small_biz project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+Efficient Rust implementation for small business owners in Africa. Manage inventory, sales, and expenses seamlessly, ensuring streamlined operations and informed decision-making. Boost your business efficiency with our tailored solutions.
+
+## Technologies Used
+
+- **Rust**: The programming language used for the backend implementation.
+- **Candid**: Used for defining the canister interface.
+- **Internet Computer (IC)**: Utilizes IC-specific libraries (`ic_cdk`) for interactions with the Internet Computer.
+
+## Components
+
+### Data Structures
+- **Inventory**: Represents information about products, including details such as name, description, quantity, amount, and timestamps.
+- **Sale**: Represents a sales transaction, including details like name, description, quantity, amount, associated store ID, and timestamps.
+- **Expense**: Represents an expense entry, with fields for name, description, amount, and timestamp.
+
+### Functionality
+- **Inventory Management**: Create, update, and retrieve information about products in the inventory.
+- **Sales Management**: Record sales transactions, update, and retrieve information about sales.
+- **Expense Management**: Track and manage business expenses.
+- **Financial Analysis**: Calculate the overall financial health by considering total sales, expenses, and inventory value.
+- **Inventory Replenishment Recommendations**: Provide recommendations for inventory restocking by searching its quantity.
+
+This system is tailored to the needs of small business owners, offering comprehensive management capabilities for efficient and informed decision-making.
 
 To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
 

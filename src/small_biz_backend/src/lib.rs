@@ -453,6 +453,34 @@ fn calculate_total_inv_amount() -> Result<f64, Error> {
     Ok(total_inv_amount)
 }
 
+#[ic_cdk::query]
+fn search_inventory_by_name_wrapper(name: String) -> Result<Vec<Inventory>, Error> {
+    search_inventory_by_name(&name)
+}
+
+fn search_inventory_by_name<'a>(name: &'a str) -> Result<Vec<Inventory>, Error> {
+    let matching_items: Vec<Inventory> = INV_STORAGE
+        .with(|service| {
+            service
+                .borrow()
+                .iter()
+                .filter(|(_, item)| item.name.contains(name))
+                .map(|(_, item)| item.clone())
+                .collect()
+        });
+
+    if !matching_items.is_empty() {
+        Ok(matching_items)
+    } else {
+        Err(Error::NotFound {
+            msg: format!("No inventory items found with name: {}", name),
+        })
+    }
+}
+
+
+
+
 
 #[derive(candid::CandidType, Deserialize, Serialize)]
 enum Error {

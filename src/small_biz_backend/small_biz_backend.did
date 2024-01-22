@@ -5,9 +5,9 @@ type Inventory = record {
   description : text;
   created_at : nat64;
   quantity : nat32;
-  amount: nat64;
+  amount: float64;
 };
-type InventoryPayload = record { name : text; description : text; quantity : nat32; amount : nat64 };
+type InventoryPayload = record { name : text; description : text; quantity : nat32; amount : float64 };
 type Error = variant { NotFound : record { msg : text } };
 type Expense = record {
   id : nat64;
@@ -59,6 +59,7 @@ get_all_inventory : () -> (Result5) query;
 calculate_total_inv_amount : () -> (Result6) query;
 calculate_total_sales_amount : () -> (Result7) query;
 calculate_total_expenses_amount : () -> (Result8) query;
+search_inventory_by_name_wrapper : (text) -> (Result5) query;
 }
 
 
