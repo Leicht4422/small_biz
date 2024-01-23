@@ -117,6 +117,7 @@ thread_local! {
     ));
 }
 
+//Payloads for adding and updating 
 #[derive(candid::CandidType, Serialize, Deserialize, Default)]
 struct InventoryPayload {
     name: String,
@@ -141,6 +142,7 @@ struct ExpensePayload {
     amount: f64
 }
 
+//Retrieve a specific entry in the Inventory
 #[ic_cdk::query]
 fn get_inventory(id: u64) -> Result<Inventory, Error> {
     match _get_inventory(&id) {
@@ -155,6 +157,7 @@ fn _get_inventory(id: &u64) -> Option<Inventory> {
     INV_STORAGE.with(|service| service.borrow().get(id))
 }
 
+//Create a new entry in the Inventory
 #[ic_cdk::update]
 fn add_inventory(payload: InventoryPayload) -> Option<Inventory> {
     let id = ID_COUNTER
@@ -176,6 +179,7 @@ fn add_inventory(payload: InventoryPayload) -> Option<Inventory> {
     Some(inventory)
 }
 
+//Update the inventory
 #[ic_cdk::update]
 fn update_inventory(id: u64, payload: InventoryPayload) -> Result<Inventory, Error> {
     match INV_STORAGE.with(|service| service.borrow().get(&id)) {
@@ -198,6 +202,7 @@ fn do_insert(inventory: &Inventory) {
     INV_STORAGE.with(|service| service.borrow_mut().insert(inventory.id, inventory.clone()));
 }
 
+//Delete an entry in the Inventory
 #[ic_cdk::update]
 fn delete_inventory(id: u64) -> Result<Inventory, Error> {
     match INV_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
@@ -209,6 +214,7 @@ fn delete_inventory(id: u64) -> Result<Inventory, Error> {
     }
 }
 
+//Retrieve a sale
 #[ic_cdk::query]
 fn get_sale(id: u64) -> Result<Sale, Error> {
     match _get_sale(&id) {
@@ -223,6 +229,7 @@ fn _get_sale(id: &u64) -> Option<Sale> {
     SALE_STORAGE.with(|service| service.borrow().get(id))
 }
 
+//Create a new Sale
 #[ic_cdk::update]
 fn add_sale(payload: SalePayload) -> Option<Sale> {
     let id = ID_COUNTER
@@ -241,16 +248,10 @@ fn add_sale(payload: SalePayload) -> Option<Sale> {
                 inventory_item.quantity -= payload.quantity;
                 do_insert(&inventory_item); // Update the inventory
             } else {
-                // Handle the case where there is not enough quantity in the inventory
-                // You may want to roll back the sale or handle this situation appropriately
-                // For simplicity, I'm returning None in this case
                 return None;
             }
         }
         None => {
-            // Handle the case where the corresponding inventory item is not found
-            // You may want to roll back the sale or handle this situation appropriately
-            // For simplicity, I'm returning None in this case
             return None;
         }
     }
@@ -267,6 +268,7 @@ fn add_sale(payload: SalePayload) -> Option<Sale> {
     Some(sale)
 }
 
+//Update a sale
 #[ic_cdk::update]
 fn update_sale(id: u64, payload: SalePayload) -> Result<Sale, Error> {
     match SALE_STORAGE.with(|service| service.borrow().get(&id)) {
@@ -291,6 +293,7 @@ fn do_insert_sale(sale: &Sale) {
     SALE_STORAGE.with(|service| service.borrow_mut().insert(sale.id, sale.clone()));
 }
 
+//Delete a Sale
 #[ic_cdk::update]
 fn delete_sale(id: u64) -> Result<Sale, Error> {
     match SALE_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
@@ -302,6 +305,7 @@ fn delete_sale(id: u64) -> Result<Sale, Error> {
     }
 }
 
+//Retrive a specific expense
 #[ic_cdk::query]
 fn get_expense(id: u64) -> Result<Expense, Error> {
     match _get_expense(&id) {
@@ -316,6 +320,7 @@ fn _get_expense(id: &u64) -> Option<Expense> {
     EXPENSE_STORAGE.with(|service| service.borrow().get(id))
 }
 
+//Create a new Expense entry
 #[ic_cdk::update]
 fn add_expense(payload: ExpensePayload) -> Option<Expense> {
     let id = ID_COUNTER
@@ -335,6 +340,7 @@ fn add_expense(payload: ExpensePayload) -> Option<Expense> {
     Some(expense)
 }
 
+//Update an expense
 #[ic_cdk::update]
 fn update_expense(id: u64, payload: ExpensePayload
 ) -> Result<Expense, Error> {
@@ -358,6 +364,7 @@ fn do_insert_expense(expense: &Expense) {
     EXPENSE_STORAGE.with(|service| service.borrow_mut().insert(expense.id, expense.clone()));
 }
 
+//Delete an expense
 #[ic_cdk::update]
 fn delete_expense(id: u64) -> Result<Expense, Error> {
     match EXPENSE_STORAGE.with(|service| service.borrow_mut().remove(&id)) {
@@ -369,6 +376,7 @@ fn delete_expense(id: u64) -> Result<Expense, Error> {
     }
 }
 
+//Retrieve all Expenses
 #[ic_cdk::query]
 fn get_all_expenses() -> Result<Vec<Expense>, Error> {
     let expenses_map: Vec<(u64, Expense)> = EXPENSE_STORAGE.with(|service| service.borrow().iter().collect());
@@ -383,6 +391,7 @@ fn get_all_expenses() -> Result<Vec<Expense>, Error> {
     }
 }
 
+//Retieve all Sales
 #[ic_cdk::query]
 fn get_all_sales() -> Result<Vec<Sale>, Error> {
     let sale_map: Vec<(u64, Sale)> = SALE_STORAGE.with(|service| service.borrow().iter().collect());
@@ -397,6 +406,7 @@ fn get_all_sales() -> Result<Vec<Sale>, Error> {
     }
 }
 
+//Retrieve all items in Inventory
 #[ic_cdk::query]
 fn get_all_inventory() -> Result<Vec<Inventory>, Error> {
     let inventory_map: Vec<(u64, Inventory)> = INV_STORAGE.with(|service| service.borrow().iter().collect());
@@ -411,6 +421,7 @@ fn get_all_inventory() -> Result<Vec<Inventory>, Error> {
     }
 }
 
+//Total Sales
 #[ic_cdk::query]
 fn calculate_total_sales_amount() -> Result<f64, Error> {
     let total_amount: f64 = SALE_STORAGE
@@ -425,6 +436,7 @@ fn calculate_total_sales_amount() -> Result<f64, Error> {
     Ok(total_amount)
 }
 
+//Total Expenses
 #[ic_cdk::query]
 fn calculate_total_expenses_amount() -> Result<f64, Error> {
     let total_expenses: f64 = EXPENSE_STORAGE
@@ -439,6 +451,7 @@ fn calculate_total_expenses_amount() -> Result<f64, Error> {
     Ok(total_expenses)
 }
 
+//Total Inventory amount
 #[ic_cdk::query]
 fn calculate_total_inv_amount() -> Result<f64, Error> {
     let total_inv_amount: f64 = INV_STORAGE
@@ -453,6 +466,7 @@ fn calculate_total_inv_amount() -> Result<f64, Error> {
     Ok(total_inv_amount)
 }
 
+//search function to retrieve a specific item in Inventory
 #[ic_cdk::query]
 fn search_inventory_by_name_wrapper(name: String) -> Result<Vec<Inventory>, Error> {
     search_inventory_by_name(&name)
