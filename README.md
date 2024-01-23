@@ -16,8 +16,8 @@ Efficient Rust implementation for small business owners in Africa. Manage invent
 - **Expense**: Represents an expense entry, with fields for name, description, amount, and timestamp.
 
 ### Functionality
-- **Inventory Management**: Create, update, and retrieve information about products in the inventory.
-- **Sales Management**: Record sales transactions, update, and retrieve information about sales.
+- **Inventory Management**: Create, update,retrieve and delete information about products in the inventory.
+- **Sales Management**: Record sales transactions, update, retrieve and delete information about sales.
 - **Expense Management**: Track and manage business expenses.
 - **Financial Analysis**: Calculate the overall financial health by considering total sales, expenses, and inventory value.
 - **Inventory Replenishment Recommendations**: Provide recommendations for inventory restocking by searching its quantity.
@@ -54,6 +54,7 @@ dfx start --background
 # Deploys your canisters to the replica and generates your candid interface
 dfx deploy
 ```
+Feel free to interact with the backend cannister to utilize these CRUD functions 
 
 Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
 
