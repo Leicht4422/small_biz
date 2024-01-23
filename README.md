@@ -58,6 +58,8 @@ Feel free to interact with the backend cannister to utilize these CRUD functions
 
 Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
 
+## Feedback updates
+
 If you have made changes to your backend canister, you can generate a new candid interface with
 
 ```bash
