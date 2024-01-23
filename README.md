@@ -38,6 +38,7 @@ To learn more before you start working with small_biz, see the following documen
 If you want to start working on your project right away, you might want to try the following commands:
 
 ```bash
+git clone https://github.com/Leicht4422/small_biz.git
 cd small_biz/
 dfx help
 dfx canister --help
